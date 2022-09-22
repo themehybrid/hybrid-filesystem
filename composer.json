@@ -1,0 +1,48 @@
+{
+    "name": "themehybrid/hybrid-filesystem",
+    "description": "The Filesystem package.",
+    "license": "GPL-2.0-or-later",
+    "keywords": [
+        "wordpress"
+    ],
+    "authors": [
+        {
+            "name": "Theme Hybrid",
+            "email": "themehybrid@gmail.com",
+            "homepage": "https://themehybrid.com",
+            "role": "Developer"
+        }
+    ],
+    "homepage": "https://github.com/themehybrid/hybrid-filesystem",
+    "support": {
+        "issues": "https://github.com/themehybrid/hybrid-filesystem/issues",
+        "forum": "https://themehybrid.com/board/forums/hybrid-core"
+    },
+    "require": {
+        "php": ">=8.1",
+        "symfony/finder": "^6.0",
+        "themehybrid/hybrid-contracts": "^2.0",
+        "themehybrid/hybrid-core": "^7.0",
+        "themehybrid/hybrid-tools": "^2.0"
+    },
+    "suggest": {
+        "ext-ftp": "Required to use the Flysystem FTP driver.",
+        "league/flysystem": "Required to use the Flysystem local driver (^3.0.16).",
+        "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (^3.0).",
+        "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.0).",
+        "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.0).",
+        "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.0).",
+        "symfony/mime": "Required to enable support for guessing extensions (^6.0)."
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "autoload": {
+        "psr-4": {
+            "Hybrid\\Filesystem\\": "src/"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
