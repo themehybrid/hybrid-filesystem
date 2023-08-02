@@ -266,7 +266,7 @@ class Filesystem {
                 } else {
                     $success = false;
                 }
-            } catch ( \ErrorException $e ) {
+            } catch ( \ErrorException ) {
                 $success = false;
             }
         }
@@ -510,7 +510,7 @@ class Filesystem {
      *
      * @param  string $directory
      * @param  bool   $hidden
-     * @return \Symfony\Component\Finder\SplFileInfo[]
+     * @return array<\Symfony\Component\Finder\SplFileInfo>
      */
     public function files( $directory, $hidden = false ) {
         return iterator_to_array(
@@ -524,7 +524,7 @@ class Filesystem {
      *
      * @param  string $directory
      * @param  bool   $hidden
-     * @return \Symfony\Component\Finder\SplFileInfo[]
+     * @return array<\Symfony\Component\Finder\SplFileInfo>
      */
     public function allFiles( $directory, $hidden = false ) {
         return iterator_to_array(
