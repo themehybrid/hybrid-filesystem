@@ -250,8 +250,7 @@ class FilesystemManager implements FactoryContract {
     /**
      * Create a Flysystem instance with the given adapter.
      *
-     * @param  \League\Flysystem\FilesystemAdapter $adapter
-     * @param  array                               $config
+     * @param  array $config
      * @return \League\Flysystem\FilesystemOperator
      */
     protected function createFlysystem( FlysystemAdapter $adapter, array $config ) {
@@ -334,8 +333,7 @@ class FilesystemManager implements FactoryContract {
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string   $driver
-     * @param  \Closure $callback
+     * @param  string $driver
      * @return $this
      */
     public function extend( $driver, Closure $callback ) {

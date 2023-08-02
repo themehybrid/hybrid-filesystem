@@ -78,9 +78,7 @@ class FilesystemAdapter implements CloudFilesystemContract {
     /**
      * Create a new filesystem adapter instance.
      *
-     * @param  \League\Flysystem\FilesystemOperator $driver
-     * @param  \League\Flysystem\FilesystemAdapter  $adapter
-     * @param  array                                $config
+     * @param  array $config
      * @return void
      */
     public function __construct( FilesystemOperator $driver, FlysystemAdapter $adapter, array $config = [] ) {
@@ -314,8 +312,8 @@ class FilesystemAdapter implements CloudFilesystemContract {
      */
     public function put( $path, $contents, $options = [] ) {
         $options = is_string( $options )
-                     ? [ 'visibility' => $options ]
-                     : (array) $options;
+                    ? [ 'visibility' => $options ]
+                    : (array) $options;
 
         try {
             if ( $contents instanceof StreamInterface ) {
@@ -500,7 +498,7 @@ class FilesystemAdapter implements CloudFilesystemContract {
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function readStream( $path ) {
         try {
@@ -511,7 +509,7 @@ class FilesystemAdapter implements CloudFilesystemContract {
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      */
     public function writeStream( $path, $resource, array $options = [] ) {
         try {
@@ -537,15 +535,21 @@ class FilesystemAdapter implements CloudFilesystemContract {
 
         if ( method_exists( $adapter, 'getUrl' ) ) {
             return $adapter->getUrl( $path );
-        } elseif ( method_exists( $this->driver, 'getUrl' ) ) {
-            return $this->driver->getUrl( $path );
-        } elseif ( $adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter ) {
-            return $this->getFtpUrl( $path );
-        } elseif ( $adapter instanceof LocalAdapter ) {
-            return $this->getLocalUrl( $path );
-        } else {
-            throw new \RuntimeException( 'This driver does not support retrieving URLs.' );
         }
+
+        if ( method_exists( $this->driver, 'getUrl' ) ) {
+            return $this->driver->getUrl( $path );
+        }
+
+        if ( $adapter instanceof FtpAdapter || $adapter instanceof SftpAdapter ) {
+            return $this->getFtpUrl( $path );
+        }
+
+        if ( $adapter instanceof LocalAdapter ) {
+            return $this->getLocalUrl( $path );
+        }
+
+        throw new \RuntimeException( 'This driver does not support retrieving URLs.' );
     }
 
     /**
@@ -779,7 +783,6 @@ class FilesystemAdapter implements CloudFilesystemContract {
     /**
      * Define a custom temporary URL builder callback.
      *
-     * @param  \Closure $callback
      * @return void
      */
     public function buildTemporaryUrlsUsing( Closure $callback ) {
@@ -788,8 +791,6 @@ class FilesystemAdapter implements CloudFilesystemContract {
 
     /**
      * Determine if Flysystem exceptions should be thrown.
-     *
-     * @return bool
      */
     protected function throwsExceptions(): bool {
         return (bool) ( $this->config['throw'] ?? false );
