@@ -2,6 +2,8 @@
 
 You can see the changes made via the [commit log](https://github.com/themehybrid/hybrid-filesystem/commits/master) for the latest release.
 
+## [1.0.0] - 2023-08-23
+
 ## [1.0.0-alpha.3] - 2023-08-02
 
 ### Changed
