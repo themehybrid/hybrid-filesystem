@@ -2,6 +2,13 @@
 
 You can see the changes made via the [commit log](https://github.com/themehybrid/hybrid-filesystem/commits/master) for the latest release.
 
+## [1.0.1] - 2023-11-07
+
+### Changed
+
+- sync with https://github.com/illuminate/support/releases/tag/v10.25.1
+- sync with https://github.com/illuminate/filesystem/releases/tag/v10.25.2
+
 ## [1.0.0] - 2023-08-23
 
 ## [1.0.0-alpha.3] - 2023-08-02
