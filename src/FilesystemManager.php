@@ -13,13 +13,17 @@ use League\Flysystem\FilesystemAdapter as FlysystemAdapter;
 use League\Flysystem\Ftp\FtpAdapter;
 use League\Flysystem\Ftp\FtpConnectionOptions;
 use League\Flysystem\Local\LocalFilesystemAdapter as LocalAdapter;
+use League\Flysystem\PathPrefixing\PathPrefixedAdapter;
 use League\Flysystem\PhpseclibV3\SftpAdapter;
 use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
+use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
+use function Hybrid\Tools\tap;
 
 /**
  * @mixin \Hybrid\Contracts\Filesystem\Filesystem
+ * @mixin \Hybrid\Filesystem\FilesystemAdapter
  */
 class FilesystemManager implements FactoryContract {
 
@@ -79,7 +83,7 @@ class FilesystemManager implements FactoryContract {
     /**
      * Get a default cloud filesystem instance.
      *
-     * @return \Hybrid\Contracts\Filesystem\Filesystem
+     * @return \Hybrid\Contracts\Filesystem\Cloud
      */
     public function cloud() {
         $name = $this->getDefaultCloudDriver();
@@ -241,10 +245,41 @@ class FilesystemManager implements FactoryContract {
         $config += [ 'version' => 'latest' ];
 
         if ( ! empty( $config['key'] ) && ! empty( $config['secret'] ) ) {
-            $config['credentials'] = Arr::only( $config, [ 'key', 'secret', 'token' ] );
+            $config['credentials'] = Arr::only( $config, [ 'key', 'secret' ] );
         }
 
-        return $config;
+        if ( ! empty( $config['token'] ) ) {
+            $config['credentials']['token'] = $config['token'];
+        }
+
+        return Arr::except( $config, [ 'token' ] );
+    }
+
+    /**
+     * Create a scoped driver.
+     *
+     * @param  array $config
+     * @return \Hybrid\Contracts\Filesystem\Filesystem
+     */
+    public function createScopedDriver( array $config ) {
+        if ( empty( $config['disk'] ) ) {
+            throw new \InvalidArgumentException( 'Scoped disk is missing "disk" configuration option.' );
+        }
+
+        if ( empty( $config['prefix'] ) ) {
+            throw new \InvalidArgumentException( 'Scoped disk is missing "prefix" configuration option.' );
+        }
+
+        return $this->build(tap(
+            is_string( $config['disk'] ) ? $this->getConfig( $config['disk'] ) : $config['disk'],
+            static function ( &$parent ) use ( $config ) {
+                $parent['prefix'] = $config['prefix'];
+
+                if ( isset( $config['visibility'] ) ) {
+                    $parent['visibility'] = $config['visibility'];
+                }
+            }
+        ));
     }
 
     /**
@@ -254,6 +289,14 @@ class FilesystemManager implements FactoryContract {
      * @return \League\Flysystem\FilesystemOperator
      */
     protected function createFlysystem( FlysystemAdapter $adapter, array $config ) {
+        if ( $config['read-only'] ?? false === true ) {
+            $adapter = new ReadOnlyFilesystemAdapter( $adapter );
+        }
+
+        if ( ! empty( $config['prefix'] ) ) {
+            $adapter = new PathPrefixedAdapter( $adapter, $config['prefix'] );
+        }
+
         return new Flysystem($adapter, Arr::only($config, [
             'directory_visibility',
             'disable_asserts',

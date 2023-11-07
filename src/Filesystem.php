@@ -53,6 +53,19 @@ class Filesystem {
     }
 
     /**
+     * Get the contents of a file as decoded JSON.
+     *
+     * @param  string $path
+     * @param  int    $flags
+     * @param  bool   $lock
+     * @return array
+     * @throws \Hybrid\Contracts\Filesystem\FileNotFoundException
+     */
+    public function json( $path, $flags = 0, $lock = false ) {
+        return json_decode( $this->get( $path, $lock ), true, 512, $flags );
+    }
+
+    /**
      * Get contents of a file with shared access.
      *
      * @param  string $path
@@ -175,11 +188,12 @@ class Filesystem {
     /**
      * Write the contents of a file, replacing it atomically if it already exists.
      *
-     * @param  string $path
-     * @param  string $content
+     * @param  string   $path
+     * @param  string   $content
+     * @param  int|null $mode
      * @return void
      */
-    public function replace( $path, $content ) {
+    public function replace( $path, $content, $mode = null ) {
         // If the path already exists and is a symlink, get the real path...
         clearstatcache( true, $path );
 
@@ -188,7 +202,11 @@ class Filesystem {
         $tempPath = tempnam( dirname( $path ), basename( $path ) );
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
-        chmod( $tempPath, 0777 - umask() );
+        if ( ! is_null( $mode ) ) {
+            chmod( $tempPath, $mode );
+        } else {
+            chmod( $tempPath, 0777 - umask() );
+        }
 
         file_put_contents( $tempPath, $content );
 
@@ -330,7 +348,7 @@ class Filesystem {
 
         $relativeTarget = ( new SymfonyFilesystem() )->makePathRelative( $target, dirname( $link ) );
 
-        $this->link( $relativeTarget, $link );
+        $this->link( $this->isFile( $target ) ? rtrim( $relativeTarget, '/' ) : $relativeTarget, $link );
     }
 
     /**
@@ -674,6 +692,8 @@ class Filesystem {
                 $this->delete( $item->getPathname() );
             }
         }
+
+        unset( $items );
 
         if ( ! $preserve ) {
             @rmdir( $directory );
