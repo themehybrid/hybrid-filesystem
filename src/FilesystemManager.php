@@ -98,10 +98,10 @@ class FilesystemManager implements FactoryContract {
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function build( $config ) {
-        return $this->resolve('ondemand', is_array( $config ) ? $config : [
+        return $this->resolve( 'ondemand', is_array( $config ) ? $config : [
             'driver' => 'local',
             'root'   => $config,
-        ]);
+        ] );
     }
 
     /**
@@ -166,7 +166,7 @@ class FilesystemManager implements FactoryContract {
             $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
         );
 
-        $links = ( $config['links'] ?? null ) === 'skip'
+        $links = 'skip' === ( $config['links'] ?? null )
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
@@ -200,7 +200,7 @@ class FilesystemManager implements FactoryContract {
     public function createSftpDriver( array $config ) {
         $provider = SftpConnectionProvider::fromArray( $config );
 
-        $root = $config['root'] ?? '/';
+        $root = $config['root'] ?? '';
 
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? []
@@ -270,7 +270,7 @@ class FilesystemManager implements FactoryContract {
             throw new \InvalidArgumentException( 'Scoped disk is missing "prefix" configuration option.' );
         }
 
-        return $this->build(tap(
+        return $this->build( tap(
             is_string( $config['disk'] ) ? $this->getConfig( $config['disk'] ) : $config['disk'],
             static function ( &$parent ) use ( $config ) {
                 $parent['prefix'] = $config['prefix'];
@@ -279,7 +279,7 @@ class FilesystemManager implements FactoryContract {
                     $parent['visibility'] = $config['visibility'];
                 }
             }
-        ));
+        ) );
     }
 
     /**
@@ -297,13 +297,14 @@ class FilesystemManager implements FactoryContract {
             $adapter = new PathPrefixedAdapter( $adapter, $config['prefix'] );
         }
 
-        return new Flysystem($adapter, Arr::only($config, [
+        return new Flysystem( $adapter, Arr::only( $config, [
             'directory_visibility',
             'disable_asserts',
+            'retain_visibility',
             'temporary_url',
             'url',
             'visibility',
-        ]));
+        ] ) );
     }
 
     /**

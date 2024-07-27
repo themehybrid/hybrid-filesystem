@@ -60,11 +60,7 @@ class LockableFile {
      * @throws \Exception
      */
     protected function createResource( $path, $mode ) {
-        $this->handle = @fopen( $path, $mode );
-
-        if ( ! $this->handle ) {
-            throw new \Exception( 'Unable to create lockable file: ' . $path . '. Please ensure you have permission to create files in this location.' );
-        }
+        $this->handle = fopen( $path, $mode );
     }
 
     /**
@@ -136,7 +132,7 @@ class LockableFile {
      * Get an exclusive lock on the file.
      *
      * @param  bool $block
-     * @return bool
+     * @return $this
      * @throws \Hybrid\Contracts\Filesystem\LockTimeoutException
      */
     public function getExclusiveLock( $block = false ) {
