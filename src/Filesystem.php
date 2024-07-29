@@ -151,7 +151,7 @@ class Filesystem {
             throw new \Hybrid\Contracts\Filesystem\FileNotFoundException( "File does not exist at path {$path}." );
         }
 
-        return LazyCollection::make(static function () use ( $path ) {
+        return LazyCollection::make( static function () use ( $path ) {
             $file = new SplFileObject( $path );
 
             $file->setFlags( SplFileObject::DROP_NEW_LINE );
@@ -159,7 +159,7 @@ class Filesystem {
             while ( ! $file->eof() ) {
                 yield $file->fgets();
             }
-        });
+        } );
     }
 
     /**
@@ -245,10 +245,11 @@ class Filesystem {
      *
      * @param  string $path
      * @param  string $data
+     * @param  bool   $lock
      * @return int
      */
-    public function append( $path, $data ) {
-        return file_put_contents( $path, $data, FILE_APPEND );
+    public function append( $path, $data, $lock = false ) {
+        return file_put_contents( $path, $data, FILE_APPEND | ( $lock ? LOCK_EX : 0 ) );
     }
 
     /**
@@ -319,7 +320,7 @@ class Filesystem {
      *
      * @param  string $target
      * @param  string $link
-     * @return void
+     * @return bool|null
      */
     public function link( $target, $link ) {
         if ( ! windows_os() ) {
@@ -499,7 +500,7 @@ class Filesystem {
     public function hasSameHash( $firstFile, $secondFile ) {
         $hash = @md5_file( $firstFile );
 
-        return $hash && $hash === @md5_file( $secondFile );
+        return $hash && hash_equals( $hash, (string) @md5_file( $secondFile ) );
     }
 
     /**
@@ -611,7 +612,7 @@ class Filesystem {
             return false;
         }
 
-        return @rename( $from, $to ) === true;
+        return true === @rename( $from, $to );
     }
 
     /**

@@ -224,7 +224,7 @@ class FilesystemAdapter implements CloudFilesystemContract {
     }
 
     /**
-     * Get the full path for the file at the given "short" path.
+     * Get the full path to the file that exists at the given relative path.
      *
      * @param  string $path
      * @return string
@@ -272,13 +272,8 @@ class FilesystemAdapter implements CloudFilesystemContract {
     public function response( $path, $name = null, array $headers = [], $disposition = 'inline' ) {
         $response = new StreamedResponse();
 
-        if ( ! array_key_exists( 'Content-Type', $headers ) ) {
-            $headers['Content-Type'] = $this->mimeType( $path );
-        }
-
-        if ( ! array_key_exists( 'Content-Length', $headers ) ) {
-            $headers['Content-Length'] = $this->size( $path );
-        }
+        $headers['Content-Type']   ??= $this->mimeType( $path );
+        $headers['Content-Length'] ??= $this->size( $path );
 
         if ( ! array_key_exists( 'Content-Disposition', $headers ) ) {
             $filename = $name ?? basename( $path );
@@ -292,11 +287,11 @@ class FilesystemAdapter implements CloudFilesystemContract {
 
         $response->headers->replace( $headers );
 
-        $response->setCallback(function () use ( $path ) {
+        $response->setCallback( function () use ( $path ) {
             $stream = $this->readStream( $path );
             fpassthru( $stream );
             fclose( $stream );
-        });
+        } );
 
         return $response;
     }

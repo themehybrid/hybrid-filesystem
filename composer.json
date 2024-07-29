@@ -20,7 +20,7 @@
     },
     "require": {
         "php": ">=8.0",
-        "symfony/finder": "^5 || ^6",
+        "symfony/finder": "^5 || ^6 | ^7",
         "themehybrid/hybrid-contracts": "^2.0",
         "themehybrid/hybrid-core": "^7.0",
         "themehybrid/hybrid-tools": "^2.0"
@@ -34,15 +34,18 @@
         "league/flysystem-ftp": "Required to use the Flysystem FTP driver (^3.0).",
         "league/flysystem-sftp-v3": "Required to use the Flysystem SFTP driver (^3.0).",
         "psr/http-message": "Required to allow Storage::put to accept a StreamInterface (^1.0).",
-        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.2).",
-        "symfony/mime": "Required to enable support for guessing extensions (^6.2)."
+        "symfony/filesystem": "Required to enable support for relative symbolic links (^6.2 | ^7.0).",
+        "symfony/mime": "Required to enable support for guessing extensions (^6.2 | ^7.0)."
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
     "autoload": {
         "psr-4": {
             "Hybrid\\Filesystem\\": "src/"
-        }
+        },
+        "files": [
+            "src/functions-helpers.php"
+        ]
     },
     "config": {
         "sort-packages": true

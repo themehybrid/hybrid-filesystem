@@ -68,10 +68,10 @@ class AwsS3V3Adapter extends FilesystemAdapter {
      * @return string
      */
     public function temporaryUrl( $path, $expiration, array $options = [] ) {
-        $command = $this->client->getCommand('GetObject', array_merge([
+        $command = $this->client->getCommand( 'GetObject', array_merge( [
             'Bucket' => $this->config['bucket'],
             'Key'    => $this->prefixer->prefixPath( $path ),
-        ], $options));
+        ], $options ) );
 
         $uri = $this->client->createPresignedRequest( $command, $expiration, $options )->getUri();
 
@@ -94,10 +94,10 @@ class AwsS3V3Adapter extends FilesystemAdapter {
      * @return array
      */
     public function temporaryUploadUrl( $path, $expiration, array $options = [] ) {
-        $command = $this->client->getCommand('PutObject', array_merge([
+        $command = $this->client->getCommand( 'PutObject', array_merge( [
             'Bucket' => $this->config['bucket'],
             'Key'    => $this->prefixer->prefixPath( $path ),
-        ], $options));
+        ], $options ) );
 
         $signedRequest = $this->client->createPresignedRequest( $command, $expiration, $options );
 
