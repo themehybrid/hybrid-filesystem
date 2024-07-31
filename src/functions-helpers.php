@@ -3,6 +3,7 @@
  * Helper functions.
  *
  * @package   HybridFilesystem
+ *
  * @link      https://themehybrid.com/hybrid-filesystem
  *
  * @author    Theme Hybrid
@@ -16,8 +17,8 @@ if ( ! function_exists( __NAMESPACE__ . '\\join_paths' ) ) {
     /**
      * Join the given paths together.
      *
-     * @param  string|null $basePath
-     * @param  string      ...$paths
+     * @param string|null $basePath
+     * @param string ...$paths
      * @return string
      */
     function join_paths( $basePath, ...$paths ) {

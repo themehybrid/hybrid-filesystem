@@ -7,6 +7,8 @@ use Hybrid\Core\Facades\Facade;
 /**
  * @see \Hybrid\Filesystem\Filesystem
  *
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
+ *
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
  * @method static string get(string $path, bool $lock = false)
@@ -61,7 +63,6 @@ use Hybrid\Core\Facades\Facade;
  * @method static void flushMacros()
  */
 class File extends Facade {
-
     /**
      * Get the registered name of the component.
      *
@@ -70,5 +71,4 @@ class File extends Facade {
     protected static function getFacadeAccessor() {
         return 'files';
     }
-
 }
