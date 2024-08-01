@@ -6,7 +6,6 @@ use Hybrid\Core\Facades\Facade;
 
 /**
  * @see \Hybrid\Filesystem\FilesystemManager
- *
  * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
  *
  * @method static \Hybrid\Contracts\Filesystem\Filesystem drive(string|null $name = null)
@@ -85,6 +84,7 @@ use Hybrid\Core\Facades\Facade;
  * @method static void createDirectory(string $location, array $config = [])
  */
 class Storage extends Facade {
+
     /**
      * Get the registered name of the component.
      *
@@ -93,4 +93,5 @@ class Storage extends Facade {
     protected static function getFacadeAccessor() {
         return 'filesystem';
     }
+
 }

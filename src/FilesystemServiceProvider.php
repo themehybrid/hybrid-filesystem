@@ -5,6 +5,7 @@ namespace Hybrid\Filesystem;
 use Hybrid\Core\ServiceProvider;
 
 class FilesystemServiceProvider extends ServiceProvider {
+
     /**
      * Register the service provider.
      *
@@ -22,7 +23,7 @@ class FilesystemServiceProvider extends ServiceProvider {
      * @return void
      */
     protected function registerNativeFilesystem() {
-        $this->app->singleton( 'files', static fn() => new Filesystem );
+        $this->app->singleton( 'files', static fn() => new Filesystem() );
     }
 
     /**
@@ -64,4 +65,5 @@ class FilesystemServiceProvider extends ServiceProvider {
     protected function getCloudDriver() {
         return $this->app['config']['filesystems.cloud'];
     }
+
 }

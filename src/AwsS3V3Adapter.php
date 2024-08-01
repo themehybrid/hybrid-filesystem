@@ -8,6 +8,7 @@ use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\FilesystemOperator;
 
 class AwsS3V3Adapter extends FilesystemAdapter {
+
     use Conditionable;
 
     /**
@@ -20,10 +21,10 @@ class AwsS3V3Adapter extends FilesystemAdapter {
     /**
      * Create a new AwsS3V3FilesystemAdapter instance.
      *
-     * @param \League\Flysystem\FilesystemOperator $driver
+     * @param \League\Flysystem\FilesystemOperator     $driver
      * @param \League\Flysystem\AwsS3V3\AwsS3V3Adapter $adapter
-     * @param array $config
-     * @param \Aws\S3\S3Client $client
+     * @param array                                    $config
+     * @param \Aws\S3\S3Client                         $client
      * @return void
      */
     public function __construct( FilesystemOperator $driver, S3Adapter $adapter, array $config, S3Client $client ) {
@@ -37,7 +38,6 @@ class AwsS3V3Adapter extends FilesystemAdapter {
      *
      * @param string $path
      * @return string
-     *
      * @throws \RuntimeException
      */
     public function url( $path ) {
@@ -65,9 +65,9 @@ class AwsS3V3Adapter extends FilesystemAdapter {
     /**
      * Get a temporary URL for the file at the given path.
      *
-     * @param string $path
+     * @param string             $path
      * @param \DateTimeInterface $expiration
-     * @param array $options
+     * @param array              $options
      * @return string
      */
     public function temporaryUrl( $path, $expiration, array $options = [] ) {
@@ -91,9 +91,9 @@ class AwsS3V3Adapter extends FilesystemAdapter {
     /**
      * Get a temporary upload URL for the file at the given path.
      *
-     * @param string $path
+     * @param string             $path
      * @param \DateTimeInterface $expiration
-     * @param array $options
+     * @param array              $options
      * @return array
      */
     public function temporaryUploadUrl( $path, $expiration, array $options = [] ) {
@@ -127,4 +127,5 @@ class AwsS3V3Adapter extends FilesystemAdapter {
     public function getClient() {
         return $this->client;
     }
+
 }

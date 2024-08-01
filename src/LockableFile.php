@@ -2,9 +2,8 @@
 
 namespace Hybrid\Filesystem;
 
-use Hybrid\Contracts\Filesystem\LockTimeoutException;
-
 class LockableFile {
+
     /**
      * The file resource.
      *
@@ -58,7 +57,6 @@ class LockableFile {
      * @param string $path
      * @param string $mode
      * @return void
-     *
      * @throws \Exception
      */
     protected function createResource( $path, $mode ) {
@@ -118,12 +116,11 @@ class LockableFile {
      *
      * @param bool $block
      * @return $this
-     *
      * @throws \Hybrid\Contracts\Filesystem\LockTimeoutException
      */
     public function getSharedLock( $block = false ) {
         if ( ! flock( $this->handle, LOCK_SH | ( $block ? 0 : LOCK_NB ) ) ) {
-            throw new LockTimeoutException( "Unable to acquire file lock at path [{$this->path}]." );
+            throw new \Hybrid\Contracts\Filesystem\LockTimeoutException( "Unable to acquire file lock at path [{$this->path}]." );
         }
 
         $this->isLocked = true;
@@ -136,12 +133,11 @@ class LockableFile {
      *
      * @param bool $block
      * @return $this
-     *
      * @throws \Hybrid\Contracts\Filesystem\LockTimeoutException
      */
     public function getExclusiveLock( $block = false ) {
         if ( ! flock( $this->handle, LOCK_EX | ( $block ? 0 : LOCK_NB ) ) ) {
-            throw new LockTimeoutException( "Unable to acquire file lock at path [{$this->path}]." );
+            throw new \Hybrid\Contracts\Filesystem\LockTimeoutException( "Unable to acquire file lock at path [{$this->path}]." );
         }
 
         $this->isLocked = true;
@@ -174,4 +170,5 @@ class LockableFile {
 
         return fclose( $this->handle );
     }
+
 }

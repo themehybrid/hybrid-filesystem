@@ -26,6 +26,7 @@ use function Hybrid\Tools\tap;
  * @mixin \Hybrid\Filesystem\FilesystemAdapter
  */
 class FilesystemManager implements FactoryContract {
+
     /**
      * The application instance.
      *
@@ -116,10 +117,9 @@ class FilesystemManager implements FactoryContract {
     /**
      * Resolve the given disk.
      *
-     * @param string $name
+     * @param string     $name
      * @param array|null $config
      * @return \Hybrid\Contracts\Filesystem\Filesystem
-     *
      * @throws \InvalidArgumentException
      */
     protected function resolve( $name, $config = null ) {
@@ -162,7 +162,7 @@ class FilesystemManager implements FactoryContract {
      */
     public function createLocalDriver( array $config ) {
         $visibility = PortableVisibilityConverter::fromArray(
-            $config['permissions']          ?? [],
+            $config['permissions'] ?? [],
             $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
         );
 
@@ -286,7 +286,7 @@ class FilesystemManager implements FactoryContract {
      * Create a Flysystem instance with the given adapter.
      *
      * @param \League\Flysystem\FilesystemAdapter $adapter
-     * @param array $config
+     * @param array                               $config
      * @return \League\Flysystem\FilesystemOperator
      */
     protected function createFlysystem( FlysystemAdapter $adapter, array $config ) {
@@ -312,7 +312,7 @@ class FilesystemManager implements FactoryContract {
      * Set the given disk instance.
      *
      * @param string $name
-     * @param mixed $disk
+     * @param mixed  $disk
      * @return $this
      */
     public function set( $name, $disk ) {
@@ -403,10 +403,11 @@ class FilesystemManager implements FactoryContract {
      * Dynamically call the default driver instance.
      *
      * @param string $method
-     * @param array $parameters
+     * @param array  $parameters
      * @return mixed
      */
     public function __call( $method, $parameters ) {
         return $this->disk()->$method( ...$parameters );
     }
+
 }
