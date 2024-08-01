@@ -6,6 +6,7 @@ use Hybrid\Core\Facades\Facade;
 
 /**
  * @see \Hybrid\Filesystem\FilesystemManager
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
  *
  * @method static \Hybrid\Contracts\Filesystem\Filesystem drive(string|null $name = null)
  * @method static \Hybrid\Contracts\Filesystem\Filesystem disk(string|null $name = null)
@@ -23,10 +24,13 @@ use Hybrid\Core\Facades\Facade;
  * @method static void purge(string|null $name = null)
  * @method static \Hybrid\Filesystem\FilesystemManager extend(string $driver, \Closure $callback)
  * @method static \Hybrid\Filesystem\FilesystemManager setApplication(\Hybrid\Contracts\Core\Application $app)
+ * @method static string path(string $path)
  * @method static bool exists(string $path)
- * @method static string|null  get(string $path)
+ * @method static string|null get(string $path)
  * @method static resource|null readStream(string $path)
  * @method static bool put(string $path, \Psr\Http\Message\StreamInterface|\Hybrid\Http\File|\Hybrid\Http\UploadedFile|string|resource $contents, mixed $options = [])
+ * @method static string|false putFile(\Hybrid\Http\File|\Hybrid\Http\UploadedFile|string $path, \Hybrid\Http\File|\Hybrid\Http\UploadedFile|string|array|null $file = null, mixed $options = [])
+ * @method static string|false putFileAs(\Hybrid\Http\File|\Hybrid\Http\UploadedFile|string $path, \Hybrid\Http\File|\Hybrid\Http\UploadedFile|string|array|null $file, string|array|null $name = null, mixed $options = [])
  * @method static bool writeStream(string $path, resource $resource, array $options = [])
  * @method static string getVisibility(string $path)
  * @method static bool setVisibility(string $path, string $visibility)
@@ -51,12 +55,9 @@ use Hybrid\Core\Facades\Facade;
  * @method static bool fileMissing(string $path)
  * @method static bool directoryExists(string $path)
  * @method static bool directoryMissing(string $path)
- * @method static string path(string $path)
  * @method static array|null json(string $path, int $flags = 0)
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, string|null $name = null, array $headers = [], string|null $disposition = 'inline')
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
- * @method static string|false putFile(\Hybrid\Http\File|\Hybrid\Http\UploadedFile|string $path, \Hybrid\Http\File|\Hybrid\Http\UploadedFile|string|array|null $file = null, mixed $options = [])
- * @method static string|false putFileAs(\Hybrid\Http\File|\Hybrid\Http\UploadedFile|string $path, \Hybrid\Http\File|\Hybrid\Http\UploadedFile|string|array|null $file, string|array|null $name = null, mixed $options = [])
  * @method static string|false checksum(string $path, array $options = [])
  * @method static string|false mimeType(string $path)
  * @method static string url(string $path)
@@ -64,7 +65,7 @@ use Hybrid\Core\Facades\Facade;
  * @method static string temporaryUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static array temporaryUploadUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static \League\Flysystem\FilesystemOperator getDriver()
- * @method static \League\Flysystem\FilesystemAdapter  getAdapter()
+ * @method static \League\Flysystem\FilesystemAdapter getAdapter()
  * @method static array getConfig()
  * @method static void buildTemporaryUrlsUsing(\Closure $callback)
  * @method static \Hybrid\Filesystem\FilesystemAdapter|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)

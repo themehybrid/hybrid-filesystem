@@ -28,8 +28,8 @@ class LockableFile {
     /**
      * Create a new File instance.
      *
-     * @param  string $path
-     * @param  string $mode
+     * @param string $path
+     * @param string $mode
      * @return void
      */
     public function __construct( $path, $mode ) {
@@ -42,7 +42,7 @@ class LockableFile {
     /**
      * Create the file's directory if necessary.
      *
-     * @param  string $path
+     * @param string $path
      * @return void
      */
     protected function ensureDirectoryExists( $path ) {
@@ -54,8 +54,8 @@ class LockableFile {
     /**
      * Create the file resource.
      *
-     * @param  string $path
-     * @param  string $mode
+     * @param string $path
+     * @param string $mode
      * @return void
      * @throws \Exception
      */
@@ -66,7 +66,7 @@ class LockableFile {
     /**
      * Read the file contents.
      *
-     * @param  int|null $length
+     * @param int|null $length
      * @return string
      */
     public function read( $length = null ) {
@@ -87,7 +87,7 @@ class LockableFile {
     /**
      * Write to the file.
      *
-     * @param  string $contents
+     * @param string $contents
      * @return $this
      */
     public function write( $contents ) {
@@ -114,7 +114,7 @@ class LockableFile {
     /**
      * Get a shared lock on the file.
      *
-     * @param  bool $block
+     * @param bool $block
      * @return $this
      * @throws \Hybrid\Contracts\Filesystem\LockTimeoutException
      */
@@ -131,7 +131,7 @@ class LockableFile {
     /**
      * Get an exclusive lock on the file.
      *
-     * @param  bool $block
+     * @param bool $block
      * @return $this
      * @throws \Hybrid\Contracts\Filesystem\LockTimeoutException
      */

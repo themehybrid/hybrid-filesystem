@@ -6,6 +6,7 @@ use Hybrid\Core\Facades\Facade;
 
 /**
  * @see \Hybrid\Filesystem\Filesystem
+ * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
  *
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
