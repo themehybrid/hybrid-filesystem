@@ -20,7 +20,7 @@
     },
     "require": {
         "php": ">=8.0",
-        "symfony/finder": "^5 || ^6 | ^7",
+        "symfony/finder": "^5 || ^6 || ^7",
         "themehybrid/hybrid-contracts": "^2.0",
         "themehybrid/hybrid-core": "^7.0",
         "themehybrid/hybrid-tools": "^2.0"
