@@ -2,6 +2,16 @@
 
 You can see the changes made via the [commit log](https://github.com/themehybrid/hybrid-filesystem/commits/master) for the latest release.
 
+## [1.0.4] - 2026-06-03
+
+### Changed
+
+- sync with https://github.com/illuminate/support/releases/tag/v12.58.0
+- sync with https://github.com/illuminate/filesystem/releases/tag/v12.58.0
+- Update copyright date
+- lint php
+- Requires PHP 8.2 as minimum version
+
 ## [1.0.3] - 2024-08-01
 
 ### Changed

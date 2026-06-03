@@ -47,9 +47,6 @@ use Hybrid\Core\Facades\Facade;
  * @method static array allDirectories(string|null $directory = null)
  * @method static bool makeDirectory(string $path)
  * @method static bool deleteDirectory(string $directory)
- * @method static \Hybrid\Filesystem\FilesystemAdapter assertExists(string|array $path, string|null $content = null)
- * @method static \Hybrid\Filesystem\FilesystemAdapter assertMissing(string|array $path)
- * @method static \Hybrid\Filesystem\FilesystemAdapter assertDirectoryEmpty(string $path)
  * @method static bool missing(string $path)
  * @method static bool fileExists(string $path)
  * @method static bool fileMissing(string $path)
@@ -57,20 +54,23 @@ use Hybrid\Core\Facades\Facade;
  * @method static bool directoryMissing(string $path)
  * @method static array|null json(string $path, int $flags = 0)
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse response(string $path, string|null $name = null, array $headers = [], string|null $disposition = 'inline')
+ * @method static \Symfony\Component\HttpFoundation\StreamedResponse serve(\Hybrid\Http\Request $request, string $path, string|null $name = null, array $headers = [])
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse download(string $path, string|null $name = null, array $headers = [])
  * @method static string|false checksum(string $path, array $options = [])
  * @method static string|false mimeType(string $path)
  * @method static string url(string $path)
  * @method static bool providesTemporaryUrls()
+ * @method static bool providesTemporaryUploadUrls()
  * @method static string temporaryUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static array temporaryUploadUrl(string $path, \DateTimeInterface $expiration, array $options = [])
  * @method static \League\Flysystem\FilesystemOperator getDriver()
  * @method static \League\Flysystem\FilesystemAdapter getAdapter()
  * @method static array getConfig()
+ * @method static void serveUsing(\Closure $callback)
  * @method static void buildTemporaryUrlsUsing(\Closure $callback)
  * @method static \Hybrid\Filesystem\FilesystemAdapter|mixed when(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
  * @method static \Hybrid\Filesystem\FilesystemAdapter|mixed unless(\Closure|mixed|null $value = null, callable|null $callback = null, callable|null $default = null)
- * @method static void macro(string $name, object|callable $macro, object|callable $macro = null)
+ * @method static void macro(string $name, object|callable $macro)
  * @method static void mixin(object $mixin, bool $replace = true)
  * @method static bool hasMacro(string $name)
  * @method static void flushMacros()
@@ -84,7 +84,6 @@ use Hybrid\Core\Facades\Facade;
  * @method static void createDirectory(string $location, array $config = [])
  */
 class Storage extends Facade {
-
     /**
      * Get the registered name of the component.
      *
@@ -93,5 +92,4 @@ class Storage extends Facade {
     protected static function getFacadeAccessor() {
         return 'filesystem';
     }
-
 }
