@@ -5,7 +5,6 @@ namespace Hybrid\Filesystem;
 use Hybrid\Core\ServiceProvider;
 
 class FilesystemServiceProvider extends ServiceProvider {
-
     /**
      * Register the service provider.
      *
@@ -23,7 +22,9 @@ class FilesystemServiceProvider extends ServiceProvider {
      * @return void
      */
     protected function registerNativeFilesystem() {
-        $this->app->singleton( 'files', static fn() => new Filesystem() );
+        $this->app->singleton( 'files', function () {
+            return new Filesystem;
+        } );
     }
 
     /**
@@ -34,9 +35,13 @@ class FilesystemServiceProvider extends ServiceProvider {
     protected function registerFlysystem() {
         $this->registerManager();
 
-        $this->app->singleton( 'filesystem.disk', fn( $app ) => $app['filesystem']->disk( $this->getDefaultDriver() ) );
+        $this->app->singleton( 'filesystem.disk', function ( $app ) {
+            return $app['filesystem']->disk( $this->getDefaultDriver() );
+        } );
 
-        $this->app->singleton( 'filesystem.cloud', fn( $app ) => $app['filesystem']->disk( $this->getCloudDriver() ) );
+        $this->app->singleton( 'filesystem.cloud', function ( $app ) {
+            return $app['filesystem']->disk( $this->getCloudDriver() );
+        } );
     }
 
     /**
@@ -45,7 +50,9 @@ class FilesystemServiceProvider extends ServiceProvider {
      * @return void
      */
     protected function registerManager() {
-        $this->app->singleton( 'filesystem', static fn( $app ) => new FilesystemManager( $app ) );
+        $this->app->singleton( 'filesystem', function ( $app ) {
+            return new FilesystemManager( $app );
+        } );
     }
 
     /**
@@ -65,5 +72,4 @@ class FilesystemServiceProvider extends ServiceProvider {
     protected function getCloudDriver() {
         return $this->app['config']['filesystems.cloud'];
     }
-
 }

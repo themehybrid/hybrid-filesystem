@@ -6,6 +6,7 @@ use Aws\S3\S3Client;
 use Closure;
 use Hybrid\Contracts\Filesystem\Factory as FactoryContract;
 use Hybrid\Tools\Arr;
+use InvalidArgumentException;
 use League\Flysystem\AwsS3V3\AwsS3V3Adapter as S3Adapter;
 use League\Flysystem\AwsS3V3\PortableVisibilityConverter as AwsS3PortableVisibilityConverter;
 use League\Flysystem\Filesystem as Flysystem;
@@ -19,6 +20,7 @@ use League\Flysystem\PhpseclibV3\SftpConnectionProvider;
 use League\Flysystem\ReadOnly\ReadOnlyFilesystemAdapter;
 use League\Flysystem\UnixVisibility\PortableVisibilityConverter;
 use League\Flysystem\Visibility;
+use function Hybrid\Tools\enum_value;
 use function Hybrid\Tools\tap;
 
 /**
@@ -26,7 +28,6 @@ use function Hybrid\Tools\tap;
  * @mixin \Hybrid\Filesystem\FilesystemAdapter
  */
 class FilesystemManager implements FactoryContract {
-
     /**
      * The application instance.
      *
@@ -52,7 +53,6 @@ class FilesystemManager implements FactoryContract {
      * Create a new filesystem manager instance.
      *
      * @param \Hybrid\Contracts\Core\Application $app
-     * @return void
      */
     public function __construct( $app ) {
         $this->app = $app;
@@ -62,6 +62,7 @@ class FilesystemManager implements FactoryContract {
      * Get a filesystem instance.
      *
      * @param string|null $name
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function drive( $name = null ) {
@@ -72,10 +73,11 @@ class FilesystemManager implements FactoryContract {
      * Get a filesystem instance.
      *
      * @param string|null $name
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function disk( $name = null ) {
-        $name = $name ?: $this->getDefaultDriver();
+        $name = enum_value( $name ) ?: $this->getDefaultDriver();
 
         return $this->disks[ $name ] = $this->get( $name );
     }
@@ -95,6 +97,7 @@ class FilesystemManager implements FactoryContract {
      * Build an on-demand disk.
      *
      * @param string|array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function build( $config ) {
@@ -108,6 +111,7 @@ class FilesystemManager implements FactoryContract {
      * Attempt to get the disk from the local cache.
      *
      * @param string $name
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     protected function get( $name ) {
@@ -119,35 +123,38 @@ class FilesystemManager implements FactoryContract {
      *
      * @param string     $name
      * @param array|null $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
+     *
      * @throws \InvalidArgumentException
      */
     protected function resolve( $name, $config = null ) {
         $config ??= $this->getConfig( $name );
 
         if ( empty( $config['driver'] ) ) {
-            throw new \InvalidArgumentException( "Disk [{$name}] does not have a configured driver." );
+            throw new InvalidArgumentException( "Disk [{$name}] does not have a configured driver." );
         }
 
-        $name = $config['driver'];
+        $driver = $config['driver'];
 
-        if ( isset( $this->customCreators[ $name ] ) ) {
+        if ( isset( $this->customCreators[ $driver ] ) ) {
             return $this->callCustomCreator( $config );
         }
 
-        $driverMethod = 'create' . ucfirst( $name ) . 'Driver';
+        $driverMethod = 'create' . ucfirst( $driver ) . 'Driver';
 
         if ( ! method_exists( $this, $driverMethod ) ) {
-            throw new \InvalidArgumentException( "Driver [{$name}] is not supported." );
+            throw new InvalidArgumentException( "Driver [{$driver}] is not supported." );
         }
 
-        return $this->{$driverMethod}( $config );
+        return $this->{$driverMethod}( $config, $name );
     }
 
     /**
      * Call a custom driver creator.
      *
      * @param array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     protected function callCustomCreator( array $config ) {
@@ -157,10 +164,12 @@ class FilesystemManager implements FactoryContract {
     /**
      * Create an instance of the local driver.
      *
-     * @param array $config
+     * @param array  $config
+     * @param string $name
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
-    public function createLocalDriver( array $config ) {
+    public function createLocalDriver( array $config, string $name = 'local' ) {
         $visibility = PortableVisibilityConverter::fromArray(
             $config['permissions'] ?? [],
             $config['directory_visibility'] ?? $config['visibility'] ?? Visibility::PRIVATE
@@ -170,15 +179,25 @@ class FilesystemManager implements FactoryContract {
             ? LocalAdapter::SKIP_LINKS
             : LocalAdapter::DISALLOW_LINKS;
 
-        $adapter = new LocalAdapter( $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links );
+        $adapter = new LocalAdapter(
+            $config['root'], $visibility, $config['lock'] ?? LOCK_EX, $links
+        );
 
-        return new FilesystemAdapter( $this->createFlysystem( $adapter, $config ), $adapter, $config );
+        return ( new LocalFilesystemAdapter(
+            $this->createFlysystem( $adapter, $config ), $adapter, $config
+        ) )->diskName(
+            $name
+        )->shouldServeSignedUrls(
+            $config['serve'] ?? false,
+            fn() => $this->app['url']
+        );
     }
 
     /**
      * Create an instance of the ftp driver.
      *
      * @param array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function createFtpDriver( array $config ) {
@@ -195,6 +214,7 @@ class FilesystemManager implements FactoryContract {
      * Create an instance of the sftp driver.
      *
      * @param array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
      */
     public function createSftpDriver( array $config ) {
@@ -215,6 +235,7 @@ class FilesystemManager implements FactoryContract {
      * Create an instance of the Amazon S3 driver.
      *
      * @param array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Cloud
      */
     public function createS3Driver( array $config ) {
@@ -222,7 +243,9 @@ class FilesystemManager implements FactoryContract {
 
         $root = (string) ( $s3Config['root'] ?? '' );
 
-        $visibility = new AwsS3PortableVisibilityConverter( $config['visibility'] ?? Visibility::PUBLIC );
+        $visibility = new AwsS3PortableVisibilityConverter(
+            $config['visibility'] ?? Visibility::PUBLIC
+        );
 
         $streamReads = $s3Config['stream_reads'] ?? false;
 
@@ -239,6 +262,7 @@ class FilesystemManager implements FactoryContract {
      * Format the given S3 configuration with the default options.
      *
      * @param array $config
+     *
      * @return array
      */
     protected function formatS3Config( array $config ) {
@@ -246,10 +270,10 @@ class FilesystemManager implements FactoryContract {
 
         if ( ! empty( $config['key'] ) && ! empty( $config['secret'] ) ) {
             $config['credentials'] = Arr::only( $config, [ 'key', 'secret' ] );
-        }
 
-        if ( ! empty( $config['token'] ) ) {
-            $config['credentials']['token'] = $config['token'];
+            if ( ! empty( $config['token'] ) ) {
+                $config['credentials']['token'] = $config['token'];
+            }
         }
 
         return Arr::except( $config, [ 'token' ] );
@@ -259,24 +283,38 @@ class FilesystemManager implements FactoryContract {
      * Create a scoped driver.
      *
      * @param array $config
+     *
      * @return \Hybrid\Contracts\Filesystem\Filesystem
+     *
+     * @throws \InvalidArgumentException
      */
     public function createScopedDriver( array $config ) {
         if ( empty( $config['disk'] ) ) {
-            throw new \InvalidArgumentException( 'Scoped disk is missing "disk" configuration option.' );
-        }
-
-        if ( empty( $config['prefix'] ) ) {
-            throw new \InvalidArgumentException( 'Scoped disk is missing "prefix" configuration option.' );
+            throw new InvalidArgumentException( 'Scoped disk is missing "disk" configuration option.' );
+        } elseif ( empty( $config['prefix'] ) ) {
+            throw new InvalidArgumentException( 'Scoped disk is missing "prefix" configuration option.' );
         }
 
         return $this->build( tap(
             is_string( $config['disk'] ) ? $this->getConfig( $config['disk'] ) : $config['disk'],
-            static function ( &$parent ) use ( $config ) {
-                $parent['prefix'] = $config['prefix'];
+            function ( &$parent ) use ( $config ) {
+                if ( empty( $parent['prefix'] ) ) {
+                    $parent['prefix'] = $config['prefix'];
+                } else {
+                    $separator = $parent['directory_separator'] ?? DIRECTORY_SEPARATOR;
+
+                    $parentPrefix = rtrim( $parent['prefix'], $separator );
+                    $scopedPrefix = ltrim( $config['prefix'], $separator );
+
+                    $parent['prefix'] = "{$parentPrefix}{$separator}{$scopedPrefix}";
+                }
 
                 if ( isset( $config['visibility'] ) ) {
                     $parent['visibility'] = $config['visibility'];
+                }
+
+                if ( isset( $config['throw'] ) ) {
+                    $parent['throw'] = $config['throw'];
                 }
             }
         ) );
@@ -287,15 +325,20 @@ class FilesystemManager implements FactoryContract {
      *
      * @param \League\Flysystem\FilesystemAdapter $adapter
      * @param array                               $config
+     *
      * @return \League\Flysystem\FilesystemOperator
      */
     protected function createFlysystem( FlysystemAdapter $adapter, array $config ) {
-        if ( $config['read-only'] ?? false === true ) {
+        if ( $config['read-only'] ?? false ) {
             $adapter = new ReadOnlyFilesystemAdapter( $adapter );
         }
 
         if ( ! empty( $config['prefix'] ) ) {
             $adapter = new PathPrefixedAdapter( $adapter, $config['prefix'] );
+        }
+
+        if ( str_contains( $config['endpoint'] ?? '', 'r2.cloudflarestorage.com' ) ) {
+            $config['retain_visibility'] = false;
         }
 
         return new Flysystem( $adapter, Arr::only( $config, [
@@ -313,6 +356,7 @@ class FilesystemManager implements FactoryContract {
      *
      * @param string $name
      * @param mixed  $disk
+     *
      * @return $this
      */
     public function set( $name, $disk ) {
@@ -325,6 +369,7 @@ class FilesystemManager implements FactoryContract {
      * Get the filesystem connection configuration.
      *
      * @param string $name
+     *
      * @return array
      */
     protected function getConfig( $name ) {
@@ -353,6 +398,7 @@ class FilesystemManager implements FactoryContract {
      * Unset the given disk instances.
      *
      * @param array|string $disk
+     *
      * @return $this
      */
     public function forgetDisk( $disk ) {
@@ -367,6 +413,7 @@ class FilesystemManager implements FactoryContract {
      * Disconnect the given disk and remove from local cache.
      *
      * @param string|null $name
+     *
      * @return void
      */
     public function purge( $name = null ) {
@@ -378,7 +425,9 @@ class FilesystemManager implements FactoryContract {
     /**
      * Register a custom driver creator Closure.
      *
-     * @param string $driver
+     * @param string   $driver
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function extend( $driver, Closure $callback ) {
@@ -391,6 +440,7 @@ class FilesystemManager implements FactoryContract {
      * Set the application instance used by the manager.
      *
      * @param \Hybrid\Contracts\Core\Application $app
+     *
      * @return $this
      */
     public function setApplication( $app ) {
@@ -404,10 +454,10 @@ class FilesystemManager implements FactoryContract {
      *
      * @param string $method
      * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call( $method, $parameters ) {
         return $this->disk()->$method( ...$parameters );
     }
-
 }

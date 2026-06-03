@@ -6,7 +6,6 @@ use Hybrid\Core\Facades\Facade;
 
 /**
  * @see \Hybrid\Filesystem\Filesystem
- * @phpcsSuppress SlevomatCodingStandard.TypeHints.DisallowMixedTypeHint.DisallowedMixedTypeHint
  *
  * @method static bool exists(string $path)
  * @method static bool missing(string $path)
@@ -47,6 +46,7 @@ use Hybrid\Core\Facades\Facade;
  * @method static array<\Symfony\Component\Finder\SplFileInfo> files(string $directory, bool $hidden = false)
  * @method static array<\Symfony\Component\Finder\SplFileInfo> allFiles(string $directory, bool $hidden = false)
  * @method static array directories(string $directory)
+ * @method static array allDirectories(string $directory)
  * @method static void ensureDirectoryExists(string $path, int $mode = 0755, bool $recursive = true)
  * @method static bool makeDirectory(string $path, int $mode = 0755, bool $recursive = false, bool $force = false)
  * @method static bool moveDirectory(string $from, string $to, bool $overwrite = false)
@@ -62,7 +62,6 @@ use Hybrid\Core\Facades\Facade;
  * @method static void flushMacros()
  */
 class File extends Facade {
-
     /**
      * Get the registered name of the component.
      *
@@ -71,5 +70,4 @@ class File extends Facade {
     protected static function getFacadeAccessor() {
         return 'files';
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Helper functions.
  *
@@ -18,9 +19,8 @@ if ( ! function_exists( __NAMESPACE__ . '\\join_paths' ) ) {
      *
      * @param string|null $basePath
      * @param string      ...$paths
-     * @return string
      */
-    function join_paths( $basePath, ...$paths ) {
+    function join_paths( $basePath, ...$paths ): string {
         foreach ( $paths as $index => $path ) {
             if ( empty( $path ) && '0' !== $path ) {
                 unset( $paths[ $index ] );
